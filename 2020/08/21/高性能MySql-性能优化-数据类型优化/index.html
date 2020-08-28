@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="MySQL的存储引擎选择 不要多说，选InnoDB选择优化的数据类型 更小的通常更好 简单就好 尽量避免NULL整数类型 TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT 分别是8，16，24，32，64位 UNSIGNED属性，表示不允许负值，正数上限范围提高一倍 MySQL可以为整数类型指定宽度INT（11），对大多数应用这是没有意义的，不会限制值的合法范围，只是规定">
+  <meta name="description" content="MySQL的存储引擎选择 不要多说，选InnoDB">
 <meta property="og:type" content="article">
 <meta property="og:title" content="高性能MySql-性能优化-数据类型优化">
 <meta property="og:url" content="http://yoursite.com/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/index.html">
 <meta property="og:site_name" content="Yuner&#39;s Blog">
-<meta property="og:description" content="MySQL的存储引擎选择 不要多说，选InnoDB选择优化的数据类型 更小的通常更好 简单就好 尽量避免NULL整数类型 TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT 分别是8，16，24，32，64位 UNSIGNED属性，表示不允许负值，正数上限范围提高一倍 MySQL可以为整数类型指定宽度INT（11），对大多数应用这是没有意义的，不会限制值的合法范围，只是规定">
+<meta property="og:description" content="MySQL的存储引擎选择 不要多说，选InnoDB">
 <meta property="og:locale">
 <meta property="article:published_time" content="2020-08-21T13:25:04.000Z">
-<meta property="article:modified_time" content="2020-08-21T13:26:38.745Z">
+<meta property="article:modified_time" content="2020-08-28T11:09:30.038Z">
 <meta property="article:author" content="Yuner">
 <meta property="article:tag" content="数据库">
 <meta property="article:tag" content="mysql">
@@ -190,10 +190,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-08-21 21:25:04 / Modified: 21:26:38" itemprop="dateCreated datePublished" datetime="2020-08-21T21:25:04+08:00">2020-08-21</time>
+              <time title="Created: 2020-08-21 21:25:04" itemprop="dateCreated datePublished" datetime="2020-08-21T21:25:04+08:00">2020-08-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-28 19:09:30" itemprop="dateModified" datetime="2020-08-28T19:09:30+08:00">2020-08-28</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -216,17 +222,29 @@
 
       
         <h3 id="MySQL的存储引擎选择"><a href="#MySQL的存储引擎选择" class="headerlink" title="MySQL的存储引擎选择"></a>MySQL的存储引擎选择</h3><ul>
-<li>不要多说，选InnoDB<h3 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h3></li>
-<li>更小的通常更好</li>
-<li>简单就好</li>
-<li>尽量避免NULL<h4 id="整数类型"><a href="#整数类型" class="headerlink" title="整数类型"></a>整数类型</h4></li>
-<li>TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT</li>
-<li>分别是8，16，24，32，64位</li>
-<li>UNSIGNED属性，表示不允许负值，正数上限范围提高一倍</li>
-<li>MySQL可以为整数类型指定宽度INT（11），对大多数应用这是没有意义的，不会限制值的合法范围，只是规定了显示字符的个数。<h4 id="实数类型"><a href="#实数类型" class="headerlink" title="实数类型"></a>实数类型</h4></li>
-<li>DECIMAL用于存储精确的浮点数，是在MYSQL服务器实现的，不是CPU，因此性能低下</li>
-<li>FLOAT和DOUBLE是不精确的</li>
-<li>可以使用BIGINT乘上相应的倍数来代替，DECIMAL</li>
+<li><p>不要多说，选InnoDB</p>
+<a id="more"></a>
+<h3 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h3></li>
+<li><p>更小的通常更好</p>
+</li>
+<li><p>简单就好</p>
+</li>
+<li><p>尽量避免NULL</p>
+<h4 id="整数类型"><a href="#整数类型" class="headerlink" title="整数类型"></a>整数类型</h4></li>
+<li><p>TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT</p>
+</li>
+<li><p>分别是8，16，24，32，64位</p>
+</li>
+<li><p>UNSIGNED属性，表示不允许负值，正数上限范围提高一倍</p>
+</li>
+<li><p>MySQL可以为整数类型指定宽度INT（11），对大多数应用这是没有意义的，不会限制值的合法范围，只是规定了显示字符的个数。</p>
+<h4 id="实数类型"><a href="#实数类型" class="headerlink" title="实数类型"></a>实数类型</h4></li>
+<li><p>DECIMAL用于存储精确的浮点数，是在MYSQL服务器实现的，不是CPU，因此性能低下</p>
+</li>
+<li><p>FLOAT和DOUBLE是不精确的</p>
+</li>
+<li><p>可以使用BIGINT乘上相应的倍数来代替，DECIMAL</p>
+</li>
 </ul>
 <h4 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h4><ul>
 <li>VARCHAR和CHAR</li>
@@ -336,7 +354,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
