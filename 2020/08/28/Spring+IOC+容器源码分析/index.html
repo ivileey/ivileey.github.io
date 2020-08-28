@@ -20,31 +20,38 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="一个爱逼逼叨叨的程序员">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Yuner&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="Spring 最重要的概念是 IOC 和 AOP，本篇文章其实就是要带领大家来分析下 Spring 的 IOC 容器。既然大家平时都要用到 Spring，怎么可以不好好了解 Spring 呢？阅读本文并不能让你成为 Spring 专家，不过一定有助于大家理解 Spring 的很多概念，帮助大家排查应用中和 Spring 相关的一些问题。 本文采用的源码版本是 4.3.11.RELEASE，算是 5">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring IOC 容器源码分析(转载)">
+<meta property="og:url" content="http://yoursite.com/2020/08/28/Spring+IOC+%E5%AE%B9%E5%99%A8%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="Yuner&#39;s Blog">
-<meta property="og:description" content="一个爱逼逼叨叨的程序员">
+<meta property="og:description" content="Spring 最重要的概念是 IOC 和 AOP，本篇文章其实就是要带领大家来分析下 Spring 的 IOC 容器。既然大家平时都要用到 Spring，怎么可以不好好了解 Spring 呢？阅读本文并不能让你成为 Spring 专家，不过一定有助于大家理解 Spring 的很多概念，帮助大家排查应用中和 Spring 相关的一些问题。 本文采用的源码版本是 4.3.11.RELEASE，算是 5">
 <meta property="og:locale">
+<meta property="og:image" content="https://www.javadoop.com/blogimages/spring-context/1.png">
+<meta property="og:image" content="https://www.javadoop.com/blogimages/spring-context/2.png">
+<meta property="og:image" content="https://www.javadoop.com/blogimages/spring-context/3.png">
+<meta property="article:published_time" content="2020-08-28T10:41:46.000Z">
+<meta property="article:modified_time" content="2020-08-28T11:00:09.569Z">
 <meta property="article:author" content="Yuner">
-<meta property="article:tag" content="Yuner">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="spring">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.javadoop.com/blogimages/spring-context/1.png">
 
-<link rel="canonical" href="http://yoursite.com/">
+<link rel="canonical" href="http://yoursite.com/2020/08/28/Spring+IOC+%E5%AE%B9%E5%99%A8%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-Hans'
   };
 </script>
 
-  <title>Yuner's Blog</title>
+  <title>Spring IOC 容器源码分析(转载) | Yuner's Blog</title>
   
 
 
@@ -158,9 +165,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
@@ -176,10 +184,9 @@
       <meta itemprop="name" content="Yuner's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/28/Spring+IOC+%E5%AE%B9%E5%99%A8%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">Spring IOC 容器源码分析(转载)</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Spring IOC 容器源码分析(转载)
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -212,7 +219,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Spring 最重要的概念是 IOC 和 AOP，本篇文章其实就是要带领大家来分析下 Spring 的 IOC 容器。既然大家平时都要用到 Spring，怎么可以不好好了解 Spring 呢？阅读本文并不能让你成为 Spring 专家，不过一定有助于大家理解 Spring 的很多概念，帮助大家排查应用中和 Spring 相关的一些问题。</p>
+        <p>Spring 最重要的概念是 IOC 和 AOP，本篇文章其实就是要带领大家来分析下 Spring 的 IOC 容器。既然大家平时都要用到 Spring，怎么可以不好好了解 Spring 呢？阅读本文并不能让你成为 Spring 专家，不过一定有助于大家理解 Spring 的很多概念，帮助大家排查应用中和 Spring 相关的一些问题。</p>
 <p>本文采用的源码版本是 4.3.11.RELEASE，算是 5.0.x 前比较新的版本了。为了降低难度，本文所说的所有的内容都是基于 xml 的配置的方式，实际使用已经很少人这么做了，至少不是纯 xml 配置，不过从理解源码的角度来看用这种方式来说无疑是最合适的。</p>
 <p>阅读建议：读者至少需要知道怎么配置 Spring，了解 Spring 中的各种概念，少部分内容我还假设读者使用过 SpringMVC。本文要说的 IOC 总体来说有两处地方最重要，一个是创建 Bean 容器，一个是初始化 Bean，如果读者觉得一次性看完本文压力有点大，那么可以按这个思路分两次消化。读者不一定对 Spring 容器的源码感兴趣，也许附录部分介绍的知识对读者有些许作用。</p>
 <p>希望通过本文可以让读者不惧怕阅读 Spring 源码，也希望大家能反馈表述错误或不合理的地方。</p>
@@ -674,595 +681,34 @@
 <p>本文的缺陷在于对 Spring 预初始化 singleton beans 的过程分析不够，主要是代码量真的比较大，分支旁路众多。同时，虽然附录条目不少，但是庞大的 Spring 真的引出了很多的概念，希望日后有精力可以慢慢补充一些。</p>
 <p>（全文完）</p>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/spring/" rel="tag"># spring</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/24/java-nio/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/24/java-nio/" class="post-title-link" itemprop="url">java nio，多路复用，同步异步阻塞非阻塞</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-24 13:54:37" itemprop="dateCreated datePublished" datetime="2020-08-24T13:54:37+08:00">2020-08-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-28 18:56:20" itemprop="dateModified" datetime="2020-08-28T18:56:20+08:00">2020-08-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>​    </p>
-<p>​    说起javanio基础就是要先理解同步，异步，阻塞，非阻塞这四种含义，然后就涉及到了底层调用select，poll，epoll，函数的作用。这些全部理解下来可能会花个时间了，而且要从实战经验中理解，比如一个服务器什么时候用多路io复用，什么时候用多线程。javanio就是使用了多路io复用，基础就是同步非阻塞的io模型。redis和nginx也是用到了多路复用，epoll函数()。</p>
-<h2 id="同步-异步-阻塞-非阻塞"><a href="#同步-异步-阻塞-非阻塞" class="headerlink" title="同步/异步/阻塞/非阻塞"></a>同步/异步/阻塞/非阻塞</h2><p>当你同步执行某项任务时，你需要等待其完成才能继续执行其他任务。当你异步执行某些操作时，你可以在完成另一个任务之前继续进行</p>
-<ul>
-<li><strong>同步</strong> ：两个同步任务相互依赖，并且一个任务必须以依赖于另一任务的某种方式执行。 比如在<code>A-&gt;B</code>事件模型中，你需要先完成 A 才能执行B。 再换句话说，同步调用中被调用者未处理完请求之前，调用不返回，调用者会一直等待结果的返回。</li>
-<li><strong>异步</strong>： 两个异步的任务完全独立的，一方的执行不需要等待另外一方的执行。再换句话说，异步调用种一调用就返回结果不需要等待结果返回，当结果返回的时候通过回调函数或者其他方式拿着结果再做相关事情.</li>
-<li><strong>阻塞：</strong> 阻塞就是发起一个请求，调用者一直等待请求结果返回，也就是当前线程会被挂起，无法从事其他任务，只有当条件就绪才能继续。</li>
-<li><strong>非阻塞：</strong> 非阻塞就是发起一个请求，调用者不用一直等着结果返回，可以先去干其他事情。</li>
-</ul>
-<p>同步/异步是从行为角度描述事物的，而阻塞和非阻塞描述的当前事物的状态（等待调用结果时的状态）。</p>
-<h2 id="select-poll-epoll"><a href="#select-poll-epoll" class="headerlink" title="select/poll/epoll"></a>select/poll/epoll</h2><p>​    判断是否有文件描述符准备好</p>
-<ul>
-<li><p>select</p>
-<p>fd_set 使用数组实现<br>1.单个进程可监视的fd数量被限制，即能监听端口的大小有限。</p>
-<p>   一般来说这个数目和系统内存关系很大。32位机默认是1024个。64位机默认是2048.</p>
-<p>2.rset不可重用，新的fd进来，重新创建<br>3.用户态rset拷贝到内核态rset进行判断哪个文件描述符有数据，是一种阻塞函数，用户态内核态切换有开销<br>4.O(n)时间复杂度的轮询去看哪个文件描述符有数据到达</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> while(1)&#123;</span><br><span class="line">FD_ZERO(&amp;rset);</span><br><span class="line">     for (i &#x3D; 0; i&lt; 5; i++ ) &#123;</span><br><span class="line">         FD_SET(fds[i],&amp;rset);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">      puts(&quot;round again&quot;);</span><br><span class="line">select(max+1, &amp;rset, NULL, NULL, NULL);</span><br><span class="line"></span><br><span class="line">for(i&#x3D;0;i&lt;5;i++) &#123;</span><br><span class="line">    if (FD_ISSET(fds[i], &amp;rset))&#123;</span><br><span class="line">        memset(buffer,0,MAXBUF);</span><br><span class="line">        read(fds[i], buffer, MAXBUF);</span><br><span class="line">        puts(buffer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;    </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+        
 
 
-
-</li>
-</ul>
-<ul>
-<li>poll<br>  基于链表存储fd<br>  struct pollfd{<br>  int fd;<br>  short events;<br>  short revents; //可重用<br>  }</li>
-</ul>
-<p>置位revents字段，说明有数据进来，解决了size的限制，和不可重用问题，每次使用完revents置0</p>
-<p>1、大量的fd的数组被整体复制于用户态和内核地址空间之间，而不管这样的复制是不是有意义。</p>
-<p>2、poll还有一个特点是“水平触发”，如果报告了fd后，没有被处理，那么下次poll时会再次报告该fd。 </p>
-<ul>
-<li><p>epoll</p>
-<p>  1、没有最大并发连接的限制，能打开的FD的上限远大于1024（1G的内存上能监听约10万个端口）<br>2、效率提升，不是轮询的方式，不会随着FD数目的增加效率下降。只有活跃可用的FD才会调用callback函数；</p>
-<p>3 epoll用红黑树存放要操作的fd</p>
-<p>4 epoll没有使用mmap，别再看那些说用了mmap的人了，直接看源码</p>
-</li>
-</ul>
-<h2 id="NIO"><a href="#NIO" class="headerlink" title="NIO"></a>NIO</h2><p>​    NIO（Non-blocking I/O，在Java领域，也称为New I/O）</p>
-<p>​    BIO中等待就绪的阻塞是不使用CPU的，是在“空等”；而真正的读写操作的阻塞是使用CPU的，真正在”干活”，而且这个过程非常快，属于memory copy，带宽通常在1GB/s级别以上，可以理解为基本不耗时。</p>
-<p>​    NIO的主要事件有几个：读就绪、写就绪、有新连接到来。</p>
-<p>​    其次，用一个死循环选择就绪的事件，会执行系统调用（Linux 2.6之前是select、poll，2.6之后是epoll，Windows是IOCP），还会阻塞的等待新事件的到来。新事件到来的时候，会在selector上注册标记位，标示可读、可写或者有连接到来。</p>
-<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><ol>
-<li><p>为什么 Redis 一开始选择单线程模型（单线程的好处）？</p>
-<ul>
-<li>使用 IO多路复用技术，同时监听多个文件描述符FD，由于大多是操作是基于内存的所以每次操作都非常快。</li>
-<li>可维护性高，由于是单线程的不用考虑并发读写问题</li>
-<li>基于内存，单线程状态下效率还是很高（一秒10万个用户请求），还可以使用redis分片技术。</li>
-</ul>
-</li>
-<li><p>为什么 Redis 在 6.0 之后加入了多线程（在某些情况下，单线程出现了缺点，多线程可以解决）？</p>
-<p>因为读写网络的read/write系统调用在Redis执行期间占用了大部分CPU时间，如果把网络读写做成多线程的方式对性能会有很大提升。</p>
-<p>Redis 的多线程部分只是用来处理网络数据的读写和协议解析，执行命令仍然是单线程。之所以这么设计是不想 Redis 因为多线程而变得复杂，需要去控制 key、lua、事务，LPUSH/LPOP 等等的并发问题。</p>
-<p>Redis 在最新的几个版本中加入了一些可以被其他线程异步处理的删除操作，也就是我们在上面提到的 UNLINK、FLUSHALL ASYNC 和 FLUSHDB ASYNC。</p>
-</li>
-</ol>
-<h2 id="AIO"><a href="#AIO" class="headerlink" title="AIO"></a>AIO</h2><p>​    AIO 也就是 NIO 2。在 Java 7 中引入了 NIO 的改进版 NIO 2,它是异步非阻塞的IO模型。异步 IO 是基于事件和回调机制实现的，也就是应用操作之后会直接返回，不会堵塞在那里，当后台处理完成，操作系统会通知相应的线程进行后续的操作。</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ol>
-<li><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/04/nio.html">JAVANIO</a></li>
-<li><a target="_blank" rel="noopener" href="https://juejin.im/post/6844904131023339534">redis为什么又引入了多线程</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/BIO-NIO-AIO.md">BIO,NIO,AIO总结</a></li>
-<li><a target="_blank" rel="noopener" href="https://devarea.com/linux-io-multiplexing-select-vs-poll-vs-epoll/#.X0N-5NMzZTa">Select,poll,epoll</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/aspirant/p/9166944.html">epoll</a></li>
-</ol>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/24/java-nio/" rel="prev" title="java nio，多路复用，同步异步阻塞非阻塞">
+      <i class="fa fa-chevron-left"></i> java nio，多路复用，同步异步阻塞非阻塞
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/23/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/23/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/" class="post-title-link" itemprop="url">心路历程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-08-23 15:14:10 / Modified: 15:47:01" itemprop="dateCreated datePublished" datetime="2020-08-23T15:14:10+08:00">2020-08-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">日记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>​    今天和一个本科舞社里一吃饭喝酒的学长聊了一下，每次见面都会一起促膝长谈，走的时候🚬基本满地都是，上一次长谈还是我快考研的最后一个月他来学校找我，跟我聊天，我的数学才得到拯救哈哈。</p>
-<p>​    今天听说他收到了字节和滴滴提前批的OC，给了自己也很大的鼓舞啊哈哈，要向他学习，再给自己订个小目标吧，上周辞掉了导师公司的实习，进入十月份之后开始找一下实习，把自己要复习的东西提前一下，再努力一点，一边工作一边复习。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">高性能MySql-性能优化-数据类型优化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-08-21 21:25:04 / Modified: 21:26:38" itemprop="dateCreated datePublished" datetime="2020-08-21T21:25:04+08:00">2020-08-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="MySQL的存储引擎选择"><a href="#MySQL的存储引擎选择" class="headerlink" title="MySQL的存储引擎选择"></a>MySQL的存储引擎选择</h3><ul>
-<li>不要多说，选InnoDB<h3 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h3></li>
-<li>更小的通常更好</li>
-<li>简单就好</li>
-<li>尽量避免NULL<h4 id="整数类型"><a href="#整数类型" class="headerlink" title="整数类型"></a>整数类型</h4></li>
-<li>TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT</li>
-<li>分别是8，16，24，32，64位</li>
-<li>UNSIGNED属性，表示不允许负值，正数上限范围提高一倍</li>
-<li>MySQL可以为整数类型指定宽度INT（11），对大多数应用这是没有意义的，不会限制值的合法范围，只是规定了显示字符的个数。<h4 id="实数类型"><a href="#实数类型" class="headerlink" title="实数类型"></a>实数类型</h4></li>
-<li>DECIMAL用于存储精确的浮点数，是在MYSQL服务器实现的，不是CPU，因此性能低下</li>
-<li>FLOAT和DOUBLE是不精确的</li>
-<li>可以使用BIGINT乘上相应的倍数来代替，DECIMAL</li>
-</ul>
-<h4 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h4><ul>
-<li>VARCHAR和CHAR</li>
-<li>存储在磁盘和内存中的方式和使用的存储引擎有关</li>
-<li>VARCHAR用于存储可变长字符串，需要使用1或2个额外的字节记录字符串的长度。</li>
-<li>CHAR 定长字符串。</li>
-</ul>
-<h4 id="使用枚举-ENUM-代替字符串类型"><a href="#使用枚举-ENUM-代替字符串类型" class="headerlink" title="使用枚举(ENUM)代替字符串类型"></a>使用枚举(ENUM)代替字符串类型</h4><h4 id="日期和时间类型"><a href="#日期和时间类型" class="headerlink" title="日期和时间类型"></a>日期和时间类型</h4><ul>
-<li>DATETIME能保存大范围的值</li>
-<li>TIMESTAMP 只使用4个字节的存储空间，通常尽量使用TIMESTAMP，空间效率高</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">使用动态规划解决算法导论钢条切割问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-08-20 20:43:02 / Modified: 20:44:59" itemprop="dateCreated datePublished" datetime="2020-08-20T20:43:02+08:00">2020-08-20</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="此问题dp式-：rn-max-pi-r-n-1"><a href="#此问题dp式-：rn-max-pi-r-n-1" class="headerlink" title="此问题dp式 ：rn = max(pi + r(n-1))"></a>此问题dp式 ：rn = max(pi + r(n-1))</h3><h2 id="不使用dp，用普通的递归方式来求解"><a href="#不使用dp，用普通的递归方式来求解" class="headerlink" title="不使用dp，用普通的递归方式来求解"></a>不使用dp，用普通的递归方式来求解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;使用普通的方法来计算钢条切割的最优切割方案</span><br><span class="line">public class Steelbarcutting1 &#123;</span><br><span class="line">    private int[] price;</span><br><span class="line"></span><br><span class="line">    Steelbarcutting1() &#123;</span><br><span class="line">        price &#x3D; new int[]&#123;1,5,8,9,10,17,17,20,24,30&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private int cut_rod(int n)&#123;</span><br><span class="line">        int q &#x3D; 0;</span><br><span class="line">        if(n &#x3D;&#x3D; 0)</span><br><span class="line">            return 0;</span><br><span class="line"></span><br><span class="line">        for(int i &#x3D; 1; i &lt;&#x3D; n; i++) &#123;</span><br><span class="line">            q &#x3D; Math.max(q,price[i - 1] + cut_rod(n - i));</span><br><span class="line">        &#125;</span><br><span class="line">        return q;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Steelbarcutting1 steelbarcutting1 &#x3D; new Steelbarcutting1();</span><br><span class="line">        System.out.println(steelbarcutting1.cut_rod(9));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h2 id="使用自顶向下的递归实现"><a href="#使用自顶向下的递归实现" class="headerlink" title="使用自顶向下的递归实现"></a>使用自顶向下的递归实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;使用动态规划的方式切割钢条</span><br><span class="line">&#x2F;&#x2F;自顶向下的动态规划</span><br><span class="line">public class Steelbarcutting2 &#123;</span><br><span class="line">    private int[] price;</span><br><span class="line">    private int[] r;</span><br><span class="line">    Steelbarcutting2() &#123;</span><br><span class="line">        price &#x3D; new int[]&#123;1,5,8,9,10,17,17,20,24,30&#125;;</span><br><span class="line">        r &#x3D; new int[10];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private int cut_rod(int n) &#123;</span><br><span class="line">        int q &#x3D; 0;</span><br><span class="line">        if (r[n] &gt; 0 )</span><br><span class="line">            return r[n];</span><br><span class="line">        if(n &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            q &#x3D; 0;</span><br><span class="line">        &#125;</span><br><span class="line">        for(int i &#x3D; 1; i &lt;&#x3D; n; i++) &#123;</span><br><span class="line">            q &#x3D; Math.max(q,price[i - 1] + cut_rod(n -i));</span><br><span class="line">        &#125;</span><br><span class="line">        r[n]&#x3D;q;</span><br><span class="line">        return q;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Steelbarcutting2 steelbarcutting2 &#x3D; new Steelbarcutting2();</span><br><span class="line">        System.out.println(steelbarcutting2.cut_rod(7));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h2 id="使用自低向上的版本"><a href="#使用自低向上的版本" class="headerlink" title="使用自低向上的版本"></a>使用自低向上的版本</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;自低向上的动态规划</span><br><span class="line">public class Steelbarcutting3 &#123;</span><br><span class="line">    private int[] price;</span><br><span class="line">    private int[] r;</span><br><span class="line"></span><br><span class="line">    Steelbarcutting3() &#123;</span><br><span class="line">        price &#x3D; new int[]&#123;1,5,8,9,10,17,17,20,24,30&#125;;</span><br><span class="line">        r &#x3D; new int[11];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private int cut_rod(int n) &#123;</span><br><span class="line">        int q &#x3D; 0;</span><br><span class="line">        r[0] &#x3D; 0;</span><br><span class="line">        for(int j &#x3D; 1; j &lt;&#x3D; n; j++) &#123;</span><br><span class="line">            for(int i &#x3D; 1; i &lt;&#x3D; j; i++) &#123;</span><br><span class="line">                q &#x3D; Math.max(q,price[i - 1] + r[j - i]);</span><br><span class="line">            &#125;</span><br><span class="line">            r[j] &#x3D; q;</span><br><span class="line">        &#125;</span><br><span class="line">        return r[n];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Steelbarcutting3 steelbarcutting1 &#x3D; new Steelbarcutting3();</span><br><span class="line">        System.out.println(steelbarcutting1.cut_rod(8));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/20/2020%E5%B9%B4%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/20/2020%E5%B9%B4%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87/" class="post-title-link" itemprop="url">2020年学习目标</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-08-20 13:41:47 / Modified: 14:08:32" itemprop="dateCreated datePublished" datetime="2020-08-20T13:41:47+08:00">2020-08-20</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="集合-复习阶段2小时"><a href="#集合-复习阶段2小时" class="headerlink" title="集合(复习阶段2小时)"></a>集合(复习阶段2小时)</h2><ul>
-<li>ArrayList/Vector</li>
-<li>LinkedList</li>
-<li>HashMap</li>
-<li>HashTable</li>
-<li>ConcurrentHashMap</li>
-<li>HashSet</li>
-<li>LinkedHashMap<h2 id="java多线程-1周时间"><a href="#java多线程-1周时间" class="headerlink" title="java多线程(1周时间)"></a>java多线程(1周时间)</h2></li>
-<li>常见问题</li>
-<li>synchronized</li>
-<li>锁的理解</li>
-<li>ReentrantLock</li>
-<li>线程池</li>
-<li>并发编程</li>
-<li>CMS<h2 id="JVM-1周"><a href="#JVM-1周" class="headerlink" title="JVM(1周)"></a>JVM(1周)</h2></li>
-<li>运行时内存jvm的内存结构</li>
-<li>类加载机制</li>
-<li>OOM分析</li>
-<li>垃圾回收机制</li>
-<li>对象的创建与内存分配</li>
-<li>volatile关键字</li>
-<li>一次内存溢出排查优化</li>
-<li>HashSet所引起的并发问题</li>
-<li>CPU100%排查优化<h2 id="分布式（1周）"><a href="#分布式（1周）" class="headerlink" title="分布式（1周）"></a>分布式（1周）</h2></li>
-<li>分布式限流</li>
-<li>基于Redis的分布式锁</li>
-<li>分布式缓存设计</li>
-<li>分布式ID生成器</li>
-<li>ZooKeeper<ol>
-<li>CAP定理 </li>
-<li>ZAB协议 </li>
-<li>leader选举算法和流程 </li>
-</ol>
-</li>
-<li>RPC框架<h2 id="Spring及架构（1周）"><a href="#Spring及架构（1周）" class="headerlink" title="Spring及架构（1周）"></a>Spring及架构（1周）</h2></li>
-<li>Spring Bean生命周期</li>
-<li>Spring AOP实现原理</li>
-<li>Guava 源码分析（Cache原理）</li>
-<li>Kafka produce源码分析</li>
-<li>kafka消费实践</li>
-<li>秒杀系统设计</li>
-<li>秒杀架构实践</li>
-<li>设计一个百万级的消息推送系统<h2 id="数据库（1周）"><a href="#数据库（1周）" class="headerlink" title="数据库（1周）"></a>数据库（1周）</h2></li>
-<li>MySQL索引原理</li>
-<li>SQL优化</li>
-<li>数据库水平垂直拆分</li>
-<li>一次分表实践<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2></li>
-<li>一致性Hash算法（一天）</li>
-<li>限流算法（一天）</li>
-<li>动手实现一个LRU cache<h2 id="Netty（1周）"><a href="#Netty（1周）" class="headerlink" title="Netty（1周）"></a>Netty（1周）</h2></li>
-<li>Springboot整合长链接心跳机制</li>
-<li>从线程角度看netty为什么是高性能</li>
-<li>自己实现一个Http框架</li>
-<li>搭建一个分布式IM系统</li>
-</ul>
-<h2 id="下半年的目标："><a href="#下半年的目标：" class="headerlink" title="下半年的目标："></a>下半年的目标：</h2><p>到11月前，巩固基础知识，博客继续写。<br>11月做项目：自己实现一个网络服务器，一个http框架，一个分布式系统，一个springboot商城项目。</p>
-<h2 id="上半年已完成的学习计划："><a href="#上半年已完成的学习计划：" class="headerlink" title="上半年已完成的学习计划："></a>上半年已完成的学习计划：</h2><p>并发编程 8月3日-8月9日</p>
-<p>io/网络编程 8月10日-8月16日</p>
-<p>数据库8月17日-8月23日</p>
-<p>spring源码8月24日-8月30日</p>
-<p>redis 8月31日-9月6日</p>
-<p>复习网络及IO编程 9月7日-9月13日: tcp滑动窗口，多路io复用，看鸟叔的linux，使用netty</p>
-<p>复习java并发多线程及java虚拟机内容9月14-9月20日</p>
-<p>8.17-8.23<br>java虚拟机复习完，看数据库内容</p>
-<p>8.3-8.9<br>算法上：看动态规划以及贪心算法<br>看多线程内容，java源码，ReentrantLock，Synchronized<br>leecode 337<br><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/04/nio.html">https://tech.meituan.com/2016/11/04/nio.html</a> nio<br><a target="_blank" rel="noopener" href="https://tech.meituan.com/2016/11/18/disruptor.html">https://tech.meituan.com/2016/11/18/disruptor.html</a> 高性能队列disruptor<br><a target="_blank" rel="noopener" href="https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html">https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</a> Java线程池实现原理及其在美团业务中的实践<br><a target="_blank" rel="noopener" href="https://www.shuzhiduo.com/A/amd0vWL2Jg/">https://www.shuzhiduo.com/A/amd0vWL2Jg/</a> kafka文件存储系统<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/125103277">https://zhuanlan.zhihu.com/p/125103277</a> 如何停止线程<br><a target="_blank" rel="noopener" href="https://juejin.im/post/6844904149536997384">https://juejin.im/post/6844904149536997384</a> volatile</p>
-<p>8.10-8.16<br>算法看一下BFS和DFS<br>继续学习网络和IO编程<br>看一下视频cpu时如何执行代码，机器码指令，编译器是如何在1分钟内工作<br>浮点数是如何存储的<br>字典树（Tries）<br>缓存 LRU缓存 CPU缓存</p>
-<p>8.3-8.9<br>算法上：看动态规划以及贪心算法<br>看多线程内容，java源码，ReentrantLock，Synchronized</p>
-<p>7.30 -8.2<br>看hash有关内容<br>总结4条面试内容<br>看完effective java<br>看完树和红黑树</p>
-<p>看elasticsearch 官方文档<br>看spring官方手册</p>
-<p>6.15 - 6.21<br>1.做完4套6级真题<br>2.学习spring boot推荐系统的具体实现<br>3.linux系统中网络的操作</p>
-<p>6.8 - 6.14<br>串行端口的实现<br>Linux系统中的CAN总线<br>LInux系统下的I2C总线<br>继续完成springboot推荐系统和springcloud的学习<br>看完java8和http图解和http2和java高并发程序设计</p>
-<p>6.1-6.7<br>完成spring-boot和springcloud的原理学习。<br>配置一个springboot的推荐系统。<br>配置一个springcloud的项目。</p>
-<p>完成：j2ee的商城，ssm的商城。leecode周赛。快速排序</p>
-<p>5.18-5.24<br>操作系统概念精要 500页<br>数据挖掘课程，做一个项目<br>完成数据结构一书中的算法重写 滑动窗口 分治算法等<br>学习go语言<br>6天:<br>1，做实践<br>2.了解基础知识<br>3.</p>
-<p>5.18<br>看完操作系统概念精要前100页。✓<br>数据挖掘课程了解。✓<br>写完数据结构一书的3个算法。✓<br>5.19<br>看完操作系统前200页<br>上两节课</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/20/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/20/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-20 11:14:53" itemprop="dateCreated datePublished" datetime="2020-08-20T11:14:53+08:00">2020-08-20</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
@@ -1315,6 +761,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanFactory-%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">BeanFactory 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">启动过程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Bean-%E5%AE%B9%E5%99%A8%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">创建 Bean 容器前的准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Bean-%E5%AE%B9%E5%99%A8%EF%BC%8C%E5%8A%A0%E8%BD%BD%E5%B9%B6%E6%B3%A8%E5%86%8C-Bean"><span class="nav-number">3.2.</span> <span class="nav-text">创建 Bean 容器，加载并注册 Bean</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BeanDefinition-%E6%8E%A5%E5%8F%A3%E5%AE%9A%E4%B9%89"><span class="nav-number">3.2.1.</span> <span class="nav-text">BeanDefinition 接口定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#customizeBeanFactory"><span class="nav-number">3.2.2.</span> <span class="nav-text">customizeBeanFactory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BD-Bean-loadBeanDefinitions"><span class="nav-number">3.2.3.</span> <span class="nav-text">加载 Bean: loadBeanDefinitions</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#doRegisterBeanDefinitions%EF%BC%9A"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">doRegisterBeanDefinitions：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#processBeanDefinition-%E8%A7%A3%E6%9E%90-bean-%E6%A0%87%E7%AD%BE"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">processBeanDefinition 解析 bean 标签</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C-Bean"><span class="nav-number">3.2.3.3.</span> <span class="nav-text">注册 Bean</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean-%E5%AE%B9%E5%99%A8%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%AE%8C%E6%88%90%E5%90%8E"><span class="nav-number">3.3.</span> <span class="nav-text">Bean 容器实例化完成后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87-Bean-%E5%AE%B9%E5%99%A8-prepareBeanFactory"><span class="nav-number">3.4.</span> <span class="nav-text">准备 Bean 容器: prepareBeanFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%89%80%E6%9C%89%E7%9A%84-singleton-beans"><span class="nav-number">3.5.</span> <span class="nav-text">初始化所有的 singleton beans</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#preInstantiateSingletons"><span class="nav-number">3.5.1.</span> <span class="nav-text">preInstantiateSingletons</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#getBean"><span class="nav-number">3.5.2.</span> <span class="nav-text">getBean</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Bean"><span class="nav-number">3.5.3.</span> <span class="nav-text">创建 Bean</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Bean-%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.5.3.1.</span> <span class="nav-text">创建 Bean 实例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#bean-%E5%B1%9E%E6%80%A7%E6%B3%A8%E5%85%A5"><span class="nav-number">3.5.3.2.</span> <span class="nav-text">bean 属性注入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#initializeBean"><span class="nav-number">3.5.3.3.</span> <span class="nav-text">initializeBean</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">4.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#id-%E5%92%8C-name"><span class="nav-number">4.1.</span> <span class="nav-text">id 和 name</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%98%AF%E5%90%A6%E5%85%81%E8%AE%B8-Bean-%E8%A6%86%E7%9B%96%E3%80%81%E6%98%AF%E5%90%A6%E5%85%81%E8%AE%B8%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96"><span class="nav-number">4.2.</span> <span class="nav-text">配置是否允许 Bean 覆盖、是否允许循环依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#profile"><span class="nav-number">4.3.</span> <span class="nav-text">profile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%94%9F%E6%88%90-Bean"><span class="nav-number">4.4.</span> <span class="nav-text">工厂模式生成 Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FactoryBean"><span class="nav-number">4.5.</span> <span class="nav-text">FactoryBean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96-Bean-%E7%9A%84%E5%9B%9E%E8%B0%83"><span class="nav-number">4.6.</span> <span class="nav-text">初始化 Bean 的回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%80%E6%AF%81-Bean-%E7%9A%84%E5%9B%9E%E8%B0%83"><span class="nav-number">4.7.</span> <span class="nav-text">销毁 Bean 的回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ConversionService"><span class="nav-number">4.8.</span> <span class="nav-text">ConversionService</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean-%E7%BB%A7%E6%89%BF"><span class="nav-number">4.9.</span> <span class="nav-text">Bean 继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%B3%A8%E5%85%A5"><span class="nav-number">4.10.</span> <span class="nav-text">方法注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#lookup-method"><span class="nav-number">4.10.1.</span> <span class="nav-text">lookup-method</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#replaced-method"><span class="nav-number">4.10.2.</span> <span class="nav-text">replaced-method</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BeanPostProcessor"><span class="nav-number">4.11.</span> <span class="nav-text">BeanPostProcessor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
