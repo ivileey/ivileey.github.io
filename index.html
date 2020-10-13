@@ -164,6 +164,181 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/13/java%E4%B8%ADstack-queue-deque/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Yuner">
+      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yuner's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/13/java%E4%B8%ADstack-queue-deque/" class="post-title-link" itemprop="url">java中stack,queue,deque</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-10-13 20:14:25 / Modified: 20:29:18" itemprop="dateCreated datePublished" datetime="2020-10-13T20:14:25+08:00">2020-10-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Stack-Queue-Deque"><a href="#Stack-Queue-Deque" class="headerlink" title="Stack Queue Deque"></a>Stack Queue Deque</h1><blockquote>
+<p>队列是先进先出，栈是后进先出</p>
+</blockquote>
+<p><img src="https://i2.wp.com/img-blog.csdnimg.cn/2020053121015811.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ0MDEzNjI5,size_16,color_FFFFFF,t_70"></p>
+<h2 id="1-Stack"><a href="#1-Stack" class="headerlink" title="1.Stack"></a>1.Stack</h2><h3 id="为什么不推荐使用Stack？"><a href="#为什么不推荐使用Stack？" class="headerlink" title="为什么不推荐使用Stack？"></a>为什么不推荐使用Stack？</h3><p>因为Vector是当初JAVA曾经写得不太行的类，所以Stack也不太行。</p>
+<p>Vector不行是因为效率不太行，很多方法都用了synchronized修饰，虽然线程安全，但是像ArrayDeque,LinkedList这些线程不安全的，在需要安全的时候也可以用Collections.synchronizedCollection()转化成线程安全的，所以Vector就没什么用处了</p>
+<h2 id="2-Queue"><a href="#2-Queue" class="headerlink" title="2. Queue"></a>2. Queue</h2><h3 id="接口区别："><a href="#接口区别：" class="headerlink" title="接口区别："></a>接口区别：</h3><ul>
+<li><p><strong>offer，add区别</strong>：</p>
+<p>一些队列有大小限制，因此如果想在一个满的队列中加入一个新项，多出的项就会被拒绝。</p>
+<p>这时新的 offer 方法就可以起作用了。它不是对调用 add() 方法抛出一个 unchecked 异常，而只是得到由 offer() 返回的 false。 </p>
+</li>
+<li><p><strong>poll，remove区别</strong>：</p>
+<p>remove() 和 poll() 方法都是从队列中删除第一个元素。remove() 的行为与 Collection 接口的版本相似，</p>
+<p>但是新的 poll() 方法在用空集合调用时不是抛出异常，只是返回 null。因此新的方法更适合容易出现异常条件的情况。</p>
+</li>
+<li><p><strong>peek，element区别</strong>：</p>
+<p>element() 和 peek() 用于在队列的头部查询元素。与 remove() 方法类似，在队列为空时， element() 抛出一个异常，而 peek() 返回 null</p>
+</li>
+</ul>
+<h2 id="3-Deque"><a href="#3-Deque" class="headerlink" title="3.Deque"></a>3.Deque</h2><p>Deque是Queue的子接口。</p>
+<p>Deque有两个比较重要的类：ArrayDeque和LinkedList</p>
+<p>建议 <strong>使用栈时，用ArrayDeque的push和pop方法；</strong></p>
+<p>   <strong>使用队列时，使用ArrayDeque的add和remove方法。</strong></p>
+<h3 id="Deque和Queue的区别"><a href="#Deque和Queue的区别" class="headerlink" title="Deque和Queue的区别"></a>Deque和Queue的区别</h3><p>Deque是双端队列，Queue是单端队列</p>
+<h2 id="4-PriorityQueue"><a href="#4-PriorityQueue" class="headerlink" title="4.PriorityQueue"></a>4.PriorityQueue</h2><p><strong><em>\</em>如果不提供Comparator的话，优先队列中元素默认按自然顺序排列，也就是数字默认是小的在队列头，字符串则按字典序排列。**</strong></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Yuner">
+      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yuner's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/12/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83/" class="post-title-link" itemprop="url">认证授权</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-10-12 11:40:11" itemprop="dateCreated datePublished" datetime="2020-10-12T11:40:11+08:00">2020-10-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-10-13 20:16:00" itemprop="dateModified" datetime="2020-10-13T20:16:00+08:00">2020-10-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="权限认证"><a href="#权限认证" class="headerlink" title="权限认证"></a>权限认证</h1><blockquote>
+<p>权限认证是两个概念：权限是查看用户的访问权限，认证是对用户登录的身份进行认证</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/12/%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/09/zookepper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -804,169 +979,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">高性能MySql-性能优化-数据类型优化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-21 21:25:04" itemprop="dateCreated datePublished" datetime="2020-08-21T21:25:04+08:00">2020-08-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-28 19:09:30" itemprop="dateModified" datetime="2020-08-28T19:09:30+08:00">2020-08-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="MySQL的存储引擎选择"><a href="#MySQL的存储引擎选择" class="headerlink" title="MySQL的存储引擎选择"></a>MySQL的存储引擎选择</h3><ul>
-<li><p>不要多说，选InnoDB</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/21/%E9%AB%98%E6%80%A7%E8%83%BDMySql-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%BC%98%E5%8C%96/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">使用动态规划解决算法导论钢条切割问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-20 20:43:02" itemprop="dateCreated datePublished" datetime="2020-08-20T20:43:02+08:00">2020-08-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-28 19:09:46" itemprop="dateModified" datetime="2020-08-28T19:09:46+08:00">2020-08-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="此问题dp式-：rn-max-pi-r-n-1"><a href="#此问题dp式-：rn-max-pi-r-n-1" class="headerlink" title="此问题dp式 ：rn = max(pi + r(n-1))"></a>此问题dp式 ：rn = max(pi + r(n-1))</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1036,7 +1048,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
