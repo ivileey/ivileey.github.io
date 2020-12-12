@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="一个爱逼逼叨叨的程序员">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Yuner&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/index.html">
+  <meta name="description" content="Arrays.copyof() clone() System.arraycopy()直接修改堆内存的地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数组地址拷贝的方法">
+<meta property="og:url" content="http://yoursite.com/2020/10/14/%E6%95%B0%E7%BB%84%E5%9C%B0%E5%9D%80%E6%8B%B7%E8%B4%9D%E7%9A%84%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="Yuner&#39;s Blog">
-<meta property="og:description" content="一个爱逼逼叨叨的程序员">
+<meta property="og:description" content="Arrays.copyof() clone() System.arraycopy()直接修改堆内存的地址">
 <meta property="og:locale">
+<meta property="article:published_time" content="2020-10-14T08:11:27.000Z">
+<meta property="article:modified_time" content="2020-10-14T08:36:38.536Z">
 <meta property="article:author" content="Yuner">
-<meta property="article:tag" content="Yuner">
+<meta property="article:tag" content="java">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">
+<link rel="canonical" href="http://yoursite.com/2020/10/14/%E6%95%B0%E7%BB%84%E5%9C%B0%E5%9D%80%E6%8B%B7%E8%B4%9D%E7%9A%84%E6%96%B9%E6%B3%95/">
 
 
 <script id="page-configurations">
@@ -39,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-Hans'
   };
 </script>
 
-  <title>Tag: 动态规划 | Yuner's Blog</title>
+  <title>数组地址拷贝的方法 | Yuner's Blog</title>
   
 
 
@@ -158,51 +160,93 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">动态规划
-          <small>Tag</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/14/%E6%95%B0%E7%BB%84%E5%9C%B0%E5%9D%80%E6%8B%B7%E8%B4%9D%E7%9A%84%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Yuner">
+      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yuner's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数组地址拷贝的方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-10-14 16:11:27 / Modified: 16:36:38" itemprop="dateCreated datePublished" datetime="2020-10-14T16:11:27+08:00">2020-10-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
+        <ul>
+<li>Arrays.copyof()</li>
+<li>clone()</li>
+<li>System.arraycopy()直接修改堆内存的地址</li>
+</ul>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-08-20T20:43:02+08:00"
-              content="2020-08-20">
-          08-20
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/08/20/%E4%BD%BF%E7%94%A8%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E8%A7%A3%E5%86%B3%E7%AE%97%E6%B3%95%E5%AF%BC%E8%AE%BA%E9%92%A2%E6%9D%A1%E5%88%87%E5%89%B2%E9%97%AE%E9%A2%98/" itemprop="url">
-            <span itemprop="name">使用动态规划解决算法导论钢条切割问题</span>
-          </a>
-      </div>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/13/java%E4%B8%ADstack-queue-deque/" rel="prev" title="java中stack,queue,deque">
+      <i class="fa fa-chevron-left"></i> java中stack,queue,deque
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
   </article>
-
-    </div>
-  </div>
   
   
-  
-
   
 
 

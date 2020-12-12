@@ -164,6 +164,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/14/%E6%95%B0%E7%BB%84%E5%9C%B0%E5%9D%80%E6%8B%B7%E8%B4%9D%E7%9A%84%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Yuner">
+      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yuner's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/14/%E6%95%B0%E7%BB%84%E5%9C%B0%E5%9D%80%E6%8B%B7%E8%B4%9D%E7%9A%84%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">数组地址拷贝的方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-10-14 16:11:27 / Modified: 16:36:38" itemprop="dateCreated datePublished" datetime="2020-10-14T16:11:27+08:00">2020-10-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li>Arrays.copyof()</li>
+<li>clone()</li>
+<li>System.arraycopy()直接修改堆内存的地址</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/13/java%E4%B8%ADstack-queue-deque/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -187,10 +259,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-10-13 20:14:25 / Modified: 20:29:18" itemprop="dateCreated datePublished" datetime="2020-10-13T20:14:25+08:00">2020-10-13</time>
+              <time title="Created: 2020-10-13 20:14:25" itemprop="dateCreated datePublished" datetime="2020-10-13T20:14:25+08:00">2020-10-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-10-14 09:28:12" itemprop="dateModified" datetime="2020-10-14T09:28:12+08:00">2020-10-14</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -237,6 +315,14 @@
 <p>   <strong>使用队列时，使用ArrayDeque的add和remove方法。</strong></p>
 <h3 id="Deque和Queue的区别"><a href="#Deque和Queue的区别" class="headerlink" title="Deque和Queue的区别"></a>Deque和Queue的区别</h3><p>Deque是双端队列，Queue是单端队列</p>
 <h2 id="4-PriorityQueue"><a href="#4-PriorityQueue" class="headerlink" title="4.PriorityQueue"></a>4.PriorityQueue</h2><p><strong><em>\</em>如果不提供Comparator的话，优先队列中元素默认按自然顺序排列，也就是数字默认是小的在队列头，字符串则按字典序排列。**</strong></p>
+<h2 id="5-LinkedList"><a href="#5-LinkedList" class="headerlink" title="5.LinkedList"></a>5.LinkedList</h2><p>add方法是向链表的尾部添加</p>
+<p>push方法是向链表的头部添加</p>
+<p>pop和poll都是取出LinkedList的第一个元素并将元素删除</p>
+<ul>
+<li>poll 是基于队列结构实现的方法，当队列中没有元素时，调用该方法返回 null</li>
+<li>pop 是基于栈结构实现的方法，当栈中没有元素时，调用该方法会发生异常</li>
+</ul>
+<h2 id="详细手册"><a href="#详细手册" class="headerlink" title="详细手册"></a>详细手册</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenpi/p/5269737.html">接口</a></p>
 
       
     </div>
@@ -287,7 +373,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-10-13 20:16:00" itemprop="dateModified" datetime="2020-10-13T20:16:00+08:00">2020-10-13</time>
+                <time title="Modified: 2020-10-15 19:59:51" itemprop="dateModified" datetime="2020-10-15T19:59:51+08:00">2020-10-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -910,75 +996,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/23/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Yuner">
-      <meta itemprop="description" content="一个爱逼逼叨叨的程序员">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yuner's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/23/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/" class="post-title-link" itemprop="url">心路历程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-08-23 15:14:10 / Modified: 15:47:01" itemprop="dateCreated datePublished" datetime="2020-08-23T15:14:10+08:00">2020-08-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">日记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>​    今天和一个本科舞社里一吃饭喝酒的学长聊了一下，每次见面都会一起促膝长谈，走的时候🚬基本满地都是，上一次长谈还是我快考研的最后一个月他来学校找我，跟我聊天，我的数学才得到拯救哈哈。</p>
-<p>​    今天听说他收到了字节和滴滴提前批的OC，给了自己也很大的鼓舞啊哈哈，要向他学习，再给自己订个小目标吧，上周辞掉了导师公司的实习，进入十月份之后开始找一下实习，把自己要复习的东西提前一下，再努力一点，一边工作一边复习。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1048,7 +1065,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
